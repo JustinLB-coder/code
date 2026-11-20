@@ -47,6 +47,9 @@ input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px soli
 .bar{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:.78rem;color:var(--muted)}
 .dots{display:flex;gap:5px}.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
 .url{flex:1;min-width:0;background:var(--bg);border-radius:6px;padding:3px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ptabs{display:flex;gap:4px;flex:none}
+.ptab{font:inherit;font-size:.75rem;padding:3px 9px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.ptab[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .site{position:relative;min-height:640px;display:flex;flex-direction:column}
 .site-nav{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:14px 20px;font-size:.85rem;color:var(--muted)}
 .site-nav b{font-family:var(--f-display);color:var(--ink);font-size:1.05rem}
@@ -108,16 +111,17 @@ input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px soli
 
       <h2>Questions à tester</h2>
       <ol class="tests" id="tests"></ol>
+      <p class="note">Use the Accueil / Emplois tabs above the mock page to see the greeting change by page.</p>
       <p class="note">Each answer runs on your own Claude account. Nothing is sent to your website or saved anywhere else.</p>
     </section>
 
     <section class="browser" aria-label="Aperçu du site avec l'assistant">
-      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">chezsoiedentisterie.com (aperçu)</span></div>
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url" id="pageurl">chezsoiedentisterie.com/fr/</span><span class="ptabs" role="group" aria-label="Page simulée"><button class="ptab" data-page="accueil" aria-pressed="true">Accueil</button><button class="ptab" data-page="emplois" aria-pressed="false">Emplois</button></span></div>
       <div class="site">
         <div class="site-nav"><b>Chez Soie dentisterie</b><span>Services · Équipe · Urgences · Contact · EN</span></div>
         <div class="site-hero">
-          <h3>Votre clinique dentaire familiale à Vaudreuil-Dorion</h3>
-          <p>Mock page so you can see the widget in context. Your real site is not changed.</p>
+          <h3 id="herot">Votre clinique dentaire familiale à Vaudreuil-Dorion</h3>
+          <p id="heros">Mock page so you can see the widget in context. Your real site is not changed.</p>
         </div>
         <div class="ghost"><i style="width:70%"></i><i style="width:90%"></i><i style="width:55%"></i><i style="width:80%"></i></div>
 
@@ -128,7 +132,8 @@ input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px soli
             <button id="restart" title="Nouvelle conversation" aria-label="Nouvelle conversation">↺</button>
             <button id="close" title="Réduire" aria-label="Réduire">×</button>
           </div>
-          <div class="callbar"><span>Pour un rendez-vous, appelez-nous</span><a id="calllink" href="#">—</a></div>
+          <div class="callbar" id="callbar"><span>Pour un rendez-vous, appelez-nous</span><a id="calllink" href="#">—</a></div>
+          <div class="callbar" id="jobbar" hidden><span>Postuler : écrivez à Mélissa</span><a href="mailto:melissa@chezsoiedentisterie.com">melissa@chezsoiedentisterie.com</a></div>
           <div class="msgs" id="msgs" aria-live="polite"></div>
           <div class="chips" id="chips"></div>
           <form class="compose" id="form">
@@ -162,7 +167,7 @@ HEURES D'OUVERTURE
 
 PRENDRE RENDEZ-VOUS
 - Le plus simple : appeler pendant les heures d'ouverture.
-- Autre option : écrire à info@chezsoiedentisterie.com (demande de rendez-vous); l'équipe rappelle.
+- Réservation en ligne : pas encore offerte, le service arrivera prochainement. Pour le moment, le plus simple est d'appeler pendant les heures d'ouverture ou d'écrire à info@chezsoiedentisterie.com.
 - Nous acceptons les nouveaux patients de tous âges, adultes et enfants.
 - Premier rendez-vous, apporter : carte d'assurance maladie, liste des médicaments, carte d'assurance dentaire ou numéro de membre du RCSD si applicable.
 - Patients anxieux : le dire en prenant rendez-vous. Hypnose dentaire et sédation consciente offertes.
@@ -185,7 +190,7 @@ SERVICES
 - Implants dentaires et réhabilitation complète (Dr Charles Trottier, expertise en implantologie)
 - Chirurgie : extractions, dents de sagesse, greffes gingivales
 - Traitement des gencives (parodontie)
-- Orthodontie : coquilles d'alignement (quasi invisibles), broches, appareils amovibles
+- Orthodontie : offerte par Dr Justin L. Bombardier, dentiste généraliste qui fait de l'orthodontie (il n'est PAS orthodontiste). Coquilles d'alignement (quasi invisibles), broches, appareils amovibles.
 - Denturologie : prothèses complètes, partielles et sur implants (Isabelle Choquette, denturologiste)
 - Neuromodulateurs (Botox) : permis aux dentistes formés depuis juin 2025 par l'Ordre des dentistes du Québec. Pour le grincement des dents (bruxisme), tensions et douleurs à la mâchoire, parfois migraines, et esthétique (lignes d'expression). Commence par une consultation.
 - Hypnose dentaire et sédation consciente pour les patients anxieux
@@ -196,10 +201,40 @@ SERVICES
 - Denturologiste : Isabelle Choquette
 - Une équipe d'hygiénistes dentaires et de coordonnatrices de plan de traitement
 
+CONSULTATIONS
+- Pour la plupart des consultations, des frais d'examen particulier sont facturés.
+- Exception : la consultation en orthodontie avec Dr Justin L. Bombardier est gratuite.
+
 PRIX
 - Aucun prix par clavardage : chaque cas est différent. L'équipe donne une estimation au téléphone ou lors du plan de traitement.`;
 
+const JOBS_KB = `EMPLOIS CHEZ SOIE
+- Une grande équipe soudée où l'entraide est priorisée et le travail de chacun est valorisé.
+- Tous les services de dentisterie sous le même toit, dans une ambiance décontractée, chaleureuse et humaine.
+- Équipe actuelle : 5 dentistes, une denturologiste, une équipe d'hygiénistes dentaires, des coordonnatrices de plan de traitement, une gestionnaire de clinique.
+- Clinique familiale à Vaudreuil-Dorion depuis 1980, à la Polyclinique médicale (600, boul. Harwood, bureau 300). Stationnement gratuit.
+- Pour postuler ou poser une question sur un emploi : écrire à Mélissa, gestionnaire de clinique, melissa@chezsoiedentisterie.com (joindre son CV).
+- Les postes ouverts, salaires, horaires et avantages ne sont pas listés ici : Mélissa pourra en parler.`;
+
+const PAGES = {
+  accueil: { label: "Accueil", url: "chezsoiedentisterie.com/fr/", hero: "Votre clinique dentaire familiale à Vaudreuil-Dorion", sub: "Mock page so you can see the widget in context. Your real site is not changed." },
+  emplois: { label: "Emplois", url: "chezsoiedentisterie.com/fr/emplois/", hero: "Joignez-vous à notre équipe", sub: "Mock of the Emplois / Jobs page. On the real site the bubble detects /fr/emplois/ and /en/jobs/." }
+};
+const GREETINGS = {
+  accueil: "Bonjour! Je suis l'assistant de Chez Soie dentisterie. Je peux répondre à vos questions sur nos services, nos heures et les rendez-vous.\n\nHello! I can also help in English.",
+  emplois: "Bonjour! Vous pensez à vous joindre à l'équipe Chez Soie? Je peux vous parler de la clinique et de l'ambiance de travail. Pour postuler, envoyez votre CV à Mélissa, notre gestionnaire de clinique : melissa@chezsoiedentisterie.com.\n\nThinking of joining our team? Send your résumé to Mélissa at melissa@chezsoiedentisterie.com."
+};
+const CHIP_SETS = {
+  accueil: ["Prendre rendez-vous","Urgence dentaire","Heures d'ouverture","RCSD / CDCP","Nouveaux patients","English"],
+  emplois: ["Comment postuler?","Postes ouverts?","L'ambiance d'équipe","English"]
+};
+// In production: pick the mode from the real URL.
+function pageFromPath(path){ return /\/(fr\/emplois|en\/jobs)\b/.test(path) ? "emplois" : "accueil"; }
+let page = "accueil";
+
 const TESTS = [
+  "Offrez-vous des consultations gratuites?",
+  "Est-ce que Dr Bombardier est orthodontiste?",
   "J'ai une rage de dents depuis hier soir, qu'est-ce que je fais?",
   "Do you accept new patients? I live in Hudson.",
   "Acceptez-vous la carte du RCSD? Est-ce que c'est gratuit?",
@@ -209,16 +244,17 @@ const TESTS = [
   "Can I book online?",
   "Y a-t-il du stationnement? Je suis en fauteuil roulant.",
   "Is Dr Trottier still working? I was his patient.",
-  "Est-ce que le Botox peut aider pour le grincement des dents?"
+  "Est-ce que le Botox peut aider pour le grincement des dents?",
+  {q:"Je suis hygiéniste dentaire, embauchez-vous?", page:"emplois"},
+  {q:"What's it like to work at Chez Soie?", page:"emplois"}
 ];
-const CHIPS = ["Prendre rendez-vous","Urgence dentaire","Heures d'ouverture","RCSD / CDCP","Nouveaux patients","English"];
 
 const $ = id => document.getElementById(id);
 const store = {
   get(k){try{return localStorage.getItem(k)}catch{return null}},
   set(k,v){try{localStorage.setItem(k,v)}catch{}}
 };
-let kb = store.get("cs_kb_v2") || DEFAULT_KB;
+let kb = store.get("cs_kb_v3") || DEFAULT_KB;
 let phone = store.get("cs_phone_v2") || "450 455-5671";
 $("kb").value = kb; $("phone").value = phone;
 
@@ -231,13 +267,15 @@ renderCall();
 
 $("apply").onclick = () => {
   kb = $("kb").value; phone = $("phone").value;
-  store.set("cs_kb_v2", kb); store.set("cs_phone_v2", phone); renderCall();
+  store.set("cs_kb_v3", kb); store.set("cs_phone_v2", phone); renderCall();
   $("saved").textContent = "Appliqué. La prochaine réponse utilise cette fiche.";
 };
 $("reset").onclick = () => { $("kb").value = DEFAULT_KB; $("phone").value = "450 455-5671"; $("saved").textContent = "Fiche d'origine remise. Cliquez Appliquer pour l'utiliser."; };
 
-TESTS.forEach(t => { const li = document.createElement("li"); const b = document.createElement("button"); b.textContent = t; b.onclick = () => ask(t); li.append(b); $("tests").append(li); });
-CHIPS.forEach(c => { const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.textContent = c; b.onclick = () => ask(c); $("chips").append(b); });
+TESTS.forEach(t => { const q = typeof t === "string" ? t : t.q, pg = (typeof t === "object" && t.page) || "accueil";
+  const li = document.createElement("li"); const b = document.createElement("button"); b.textContent = q + (pg === "emplois" ? " (page Emplois)" : "");
+  b.onclick = () => { if(page !== pg) setPage(pg); ask(q); }; li.append(b); $("tests").append(li); });
+function renderChips(){ $("chips").replaceChildren(); CHIP_SETS[page].forEach(c => { const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.textContent = c; b.onclick = () => ask(c); $("chips").append(b); }); }
 
 function nowInQuebec(){
   try{
@@ -245,7 +283,27 @@ function nowInQuebec(){
   }catch{ return new Date().toString(); }
 }
 
-function rules(){
+function rules(){ return page === "emplois" ? jobsRules() : patientRules(); }
+function jobsRules(){
+  return `Tu es l'assistant virtuel du site web de la clinique dentaire Chez Soie dentisterie. Le visiteur est sur la page EMPLOIS : c'est probablement un futur employé potentiel (hygiéniste, assistante dentaire, réceptionniste, dentiste, etc.).
+
+BUT : lui donner envie de se joindre à l'équipe et l'amener à écrire à Mélissa, gestionnaire de clinique, à melissa@chezsoiedentisterie.com avec son CV.
+
+INFORMATION SUR LES EMPLOIS :
+${JOBS_KB}
+
+INFORMATION SUR LA CLINIQUE (si utile) :
+${kb}
+
+RÈGLES :
+1. Réponds dans la langue du visiteur (français par défaut, anglais s'il écrit en anglais). Vouvoie en français.
+2. Sois bref, chaleureux et enthousiaste : 2 à 4 phrases courtes. Pas de titres, pas de markdown, pas d'émojis.
+3. Termine presque toujours en invitant à écrire à Mélissa : melissa@chezsoiedentisterie.com.
+4. N'invente jamais de postes ouverts, de salaires, d'horaires de travail ou d'avantages sociaux. Dis que Mélissa pourra en parler.
+5. Ne demande pas de renseignements personnels (CV, téléphone, adresse) dans le clavardage : le CV s'envoie par courriel.
+6. Si le visiteur est plutôt un patient (rendez-vous, douleur, question de soins), réponds comme pour un patient et donne le numéro de la clinique : ${phoneLabel()}.`;
+}
+function patientRules(){
   return `Tu es l'assistant virtuel du site web de la clinique dentaire Chez Soie dentisterie. Tu réponds aux visiteurs dans la fenêtre de clavardage du site.
 
 BUT : répondre aux questions fréquentes et amener le visiteur à APPELER la clinique pour prendre rendez-vous.
@@ -260,12 +318,14 @@ RÈGLES :
 1. Langue : réponds dans la langue du visiteur (français par défaut, anglais s'il écrit en anglais). Vouvoie en français.
 2. Sois bref et chaleureux : 2 à 4 phrases courtes. Pas de titres, pas de markdown, pas d'émojis. Une liste courte seulement pour les heures.
 3. Termine presque toujours par une invitation claire à appeler, avec le numéro : ${phoneLabel()}. Si la clinique est fermée en ce moment (selon l'heure actuelle et les heures d'ouverture), dis quand elle rouvre.
-4. N'invente jamais d'information absente de la fiche (prix, noms, assurances précises, réservation en ligne, stationnement, etc.). Dis simplement que l'équipe pourra répondre au téléphone.
+4. N'invente jamais d'information absente de la fiche (prix, noms, assurances précises, etc.). Dis simplement que l'équipe pourra répondre au téléphone.
 5. Aucun diagnostic ni conseil de traitement. Pour une douleur, un saignement, une enflure, une dent cassée : dis que c'est une bonne raison de consulter, d'appeler la clinique dès que possible (plages d'urgence), et, si les symptômes sont graves (enflure qui gêne la respiration ou la déglutition, fièvre importante, traumatisme au visage, saignement qui ne s'arrête pas), d'aller à l'urgence de l'hôpital ou d'appeler le 911.
 6. Ne demande jamais de renseignements de santé, de numéro d'assurance maladie ou de coordonnées. Si le visiteur en donne, ne les répète pas.
-7. RCSD/CDCP : on accepte ces patients, mais ne dis jamais que c'est gratuit ou couvert à 100 %.
+7. RCSD/CDCP : on accepte ces patients, mais ne dis jamais que c'est gratuit ou couvert à 100 %. Le seul service gratuit est la consultation en orthodontie avec Dr Justin L. Bombardier; pour toute autre consultation, explique que des frais d'examen particulier sont facturés.
 8. Pas de comparaison avec d'autres dentistes, pas de garanties de résultat, pas de témoignages.
-9. Si la question n'a aucun lien avec la clinique ou la santé dentaire, ramène poliment la conversation vers la clinique.`;
+9. Dr Justin L. Bombardier est un dentiste généraliste qui offre l'orthodontie : ne le présente jamais comme orthodontiste ou spécialiste.
+10. Réservation en ligne : pas encore offerte, elle arrivera prochainement. Pour le moment, appeler pendant les heures d'ouverture ou écrire à info@chezsoiedentisterie.com.
+11. Si la question n'a aucun lien avec la clinique ou la santé dentaire, ramène poliment la conversation vers la clinique.`;
 }
 
 let turns = [];
@@ -275,11 +335,16 @@ function bubble(cls, text){
   const d = document.createElement("div"); d.className = "m " + cls; d.textContent = text;
   $("msgs").append(d); $("msgs").scrollTop = $("msgs").scrollHeight; return d;
 }
-function greet(){
-  $("msgs").replaceChildren();
-  bubble("bot", "Bonjour! Je suis l'assistant de Chez Soie dentisterie. Je peux répondre à vos questions sur nos services, nos heures et les rendez-vous.\n\nHello! I can also help in English.");
+function greet(){ $("msgs").replaceChildren(); bubble("bot", GREETINGS[page]); }
+function setPage(pg){
+  page = pg; ctl?.abort(); turns = [];
+  const P = PAGES[pg]; $("pageurl").textContent = P.url; $("herot").textContent = P.hero; $("heros").textContent = P.sub;
+  document.querySelectorAll(".ptab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.page === pg)));
+  $("callbar").hidden = pg === "emplois"; $("jobbar").hidden = pg !== "emplois";
+  renderChips(); greet(); $("chat").hidden = false; $("launcher").hidden = true;
 }
-greet();
+document.querySelectorAll(".ptab").forEach(b => b.onclick = () => setPage(b.dataset.page));
+setPage(pageFromPath(location.pathname) || "accueil");
 
 function errCopy(code){
   switch(code){
