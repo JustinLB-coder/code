@@ -118,8 +118,17 @@
   }
 
   form.addEventListener("submit", function (e) { e.preventDefault(); var v = input.value; input.value = ""; ask(v); });
-  launcher.addEventListener("click", function () { chat.hidden = false; launcher.hidden = true; input.focus({ preventScroll: true }); });
-  close.addEventListener("click", function () { chat.hidden = true; launcher.hidden = false; });
+  launcher.addEventListener("click", function () { openChat(true); });
+  function remember(v) { try { sessionStorage.setItem("csa_closed", v); } catch (e) {} }
+  function wasClosed() { try { return sessionStorage.getItem("csa_closed") === "1"; } catch (e) { return false; } }
+  function openChat(focus) { chat.hidden = false; launcher.hidden = true; if (focus) input.focus({ preventScroll: true }); }
+  launcher.addEventListener("click", function () { remember("0"); });
+  close.addEventListener("click", function () { chat.hidden = true; launcher.hidden = false; remember("1"); });
   restart.addEventListener("click", greet);
   greet();
+
+  // Open by itself on page load, unless the visitor closed it earlier in this visit.
+  var mobile = window.matchMedia && window.matchMedia("(max-width: 768px)").matches;
+  var mode = C.autoOpen || "desktop";
+  if (!wasClosed() && (mode === "all" || (mode === "desktop" && !mobile))) openChat(false);
 })();

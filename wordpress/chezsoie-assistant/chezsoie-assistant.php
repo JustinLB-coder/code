@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Assistant Chez Soie
  * Description: Bulle de clavardage IA qui répond aux questions fréquentes et invite à appeler la clinique. Mode « administrateurs seulement » pour les essais.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Author: Chez Soie dentisterie
  * Text Domain: chezsoie-assistant
  * Requires PHP: 7.4
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CSA_VERSION', '0.1.0' );
+define( 'CSA_VERSION', '0.2.0' );
 define( 'CSA_MODEL', 'claude-opus-5-5' );
 define( 'CSA_DEFAULT_PHONE', '450 455-5671' );
 define( 'CSA_DEFAULT_KB', 'CLINIQUE
@@ -120,6 +120,7 @@ add_action( 'admin_init', function () {
 			$old = get_option( 'csa_settings', array() );
 			$out = array();
 			$out['mode']  = ( isset( $in['mode'] ) && 'public' === $in['mode'] ) ? 'public' : 'admins';
+			$out['auto_open'] = ( isset( $in['auto_open'] ) && in_array( $in['auto_open'], array( 'desktop', 'all', 'none' ), true ) ) ? $in['auto_open'] : 'desktop';
 			$out['phone'] = isset( $in['phone'] ) ? sanitize_text_field( $in['phone'] ) : CSA_DEFAULT_PHONE;
 			$out['kb']    = isset( $in['kb'] ) ? sanitize_textarea_field( $in['kb'] ) : '';
 			// Keep the stored key when the field is left blank.
@@ -147,6 +148,16 @@ function csa_settings_page() {
 					<td>
 						<label><input type="radio" name="csa_settings[mode]" value="admins" <?php checked( csa_mode(), 'admins' ); ?>> Administrateurs connectés seulement (essais)</label><br>
 						<label><input type="radio" name="csa_settings[mode]" value="public" <?php checked( csa_mode(), 'public' ); ?>> Tous les visiteurs du site</label>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Ouverture automatique</th>
+					<td>
+						<?php $ao = csa_opt( 'auto_open', 'desktop' ); ?>
+						<label><input type="radio" name="csa_settings[auto_open]" value="desktop" <?php checked( $ao, 'desktop' ); ?>> Sur ordinateur seulement (recommandé : sur cellulaire, la fenêtre couvrirait la page)</label><br>
+						<label><input type="radio" name="csa_settings[auto_open]" value="all" <?php checked( $ao, 'all' ); ?>> Sur ordinateur et cellulaire</label><br>
+						<label><input type="radio" name="csa_settings[auto_open]" value="none" <?php checked( $ao, 'none' ); ?>> Jamais (le visiteur clique sur la bulle)</label>
+						<p class="description">Si le visiteur ferme la fenêtre, elle ne se rouvre plus d'elle-même pendant sa visite.</p>
 					</td>
 				</tr>
 				<tr>
@@ -194,6 +205,7 @@ add_action( 'wp_enqueue_scripts', function () {
 		'nonce'    => wp_create_nonce( 'wp_rest' ),
 		'phone'    => csa_opt( 'phone', CSA_DEFAULT_PHONE ),
 		'testMode' => 'admins' === csa_mode(),
+		'autoOpen' => csa_opt( 'auto_open', 'desktop' ),
 	) );
 } );
 
