@@ -5,19 +5,19 @@
 <style>
 /* Layout: test bench — left column = what the bot knows (editable), right = mock site with the live chat widget */
 :root{
-  --bg:#f3f6f7; --surface:#ffffff; --ink:#132a33; --muted:#5b6f77; --line:#d9e2e5;
-  --accent:#0e6f6a; --accent-ink:#ffffff; --accent-soft:#e1f0ee; --bot:#eef3f4; --warn:#9a5b00; --warn-soft:#fff3dc;
-  --site-hero:#dfeceb;
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#041b2c; --muted:#5b6f77; --line:#d9e2e5;
+  --accent:#224268; --accent-ink:#ffffff; --accent-soft:#fbe9dd; --peach:#ec9b6a; --bot:#eef3f4; --warn:#9a5b00; --warn-soft:#fff3dc;
+  --site-hero:#e7edf4;
   --f-display:"Outfit",ui-sans-serif,system-ui,sans-serif; --f-body:"Inter",ui-sans-serif,system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0e1719; --surface:#152225; --ink:#e4eef0; --muted:#94a9af; --line:#27393d;
-  --accent:#3fb4a9; --accent-ink:#06201d; --accent-soft:#183a37; --bot:#1c2d31; --warn:#f0b65a; --warn-soft:#33270f;
-  --site-hero:#16302e; color-scheme:dark}}
+  --accent:#8fb0dc; --accent-ink:#0b1b2c; --accent-soft:#3a2a20; --peach:#ec9b6a; --bot:#1c2d31; --warn:#f0b65a; --warn-soft:#33270f;
+  --site-hero:#18263a; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e1719; --surface:#152225; --ink:#e4eef0; --muted:#94a9af; --line:#27393d;
-  --accent:#3fb4a9; --accent-ink:#06201d; --accent-soft:#183a37; --bot:#1c2d31; --warn:#f0b65a; --warn-soft:#33270f;
-  --site-hero:#16302e; color-scheme:dark}
+  --accent:#8fb0dc; --accent-ink:#0b1b2c; --accent-soft:#3a2a20; --peach:#ec9b6a; --bot:#1c2d31; --warn:#f0b65a; --warn-soft:#33270f;
+  --site-hero:#18263a; color-scheme:dark}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
 h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0}
@@ -60,13 +60,13 @@ input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px soli
 .chat{position:absolute;right:16px;bottom:16px;width:min(380px,calc(100% - 32px));height:min(560px,calc(100% - 32px));background:var(--surface);
   border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 50px rgba(10,30,35,.22);display:flex;flex-direction:column;overflow:hidden}
 .chat[hidden]{display:none!important}
-.chat-head{background:var(--accent);color:var(--accent-ink);padding:12px 14px;display:flex;align-items:center;gap:10px}
+.chat-head{border-bottom:3px solid var(--peach);background:var(--accent);color:var(--accent-ink);padding:12px 14px;display:flex;align-items:center;gap:10px}
 .chat-head .t{flex:1;min-width:0}
 .chat-head strong{font-family:var(--f-display);font-size:1rem;display:block}
 .chat-head span{font-size:.75rem;opacity:.85}
 .chat-head button{all:unset;cursor:pointer;font-size:1.2rem;line-height:1;padding:4px 6px;border-radius:6px}
 .callbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 14px;background:var(--accent-soft);font-size:.82rem;border-bottom:1px solid var(--line)}
-.callbar a{color:var(--accent);font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums}
+.callbar a{color:var(--ink);font-weight:600;text-decoration:none;font-variant-numeric:tabular-nums}
 .msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
 .m{max-width:86%;padding:9px 12px;border-radius:14px;font-size:.9rem;white-space:pre-wrap;overflow-wrap:anywhere}
 .m.bot{background:var(--bot);border-bottom-left-radius:4px;align-self:flex-start}
@@ -91,10 +91,10 @@ input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px soli
   <div class="grid">
     <section class="bench panel" aria-label="Réglages du prototype">
       <h2>Ce que l'assistant sait</h2>
-      <p>The bot only answers from this sheet. Edit it, then click Apply, and the next answer uses it. Your edits stay in this browser only.</p>
+      <p>Filled from chezsoiedentisterie.com (FAQ, Urgence, Contact, Financement, Équipe, services), Nov. 20, 2026. The bot only answers from this sheet. Edit it, then click Apply, and the next answer uses it. Your edits stay in this browser only.</p>
       <div class="field">
         <label for="phone">Téléphone de la clinique</label>
-        <input type="text" id="phone" placeholder="Ex. 450-000-0000 (à compléter)">
+        <input type="text" id="phone" placeholder="450 455-5671">
       </div>
       <div class="field">
         <label for="kb">Fiche FAQ</label>
@@ -144,11 +144,14 @@ input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px soli
 
 <script>
 const DEFAULT_KB = `CLINIQUE
-- Nom : Chez Soie dentisterie (anciennement Marcotte médecine dentaire)
-- Clinique dentaire familiale, enfants bienvenus
-- Adresse : Polyclinique médicale, 600 boul. Harwood, Vaudreuil-Dorion, QC
-- Langues : français et anglais
-- Secteur desservi : Vaudreuil-Dorion, L'Île-Perrot, Pincourt, Saint-Lazare, Hudson, Les Cèdres, Vaudreuil-sur-le-Lac
+- Nom : Chez Soie dentisterie. Anciennement Marcotte médecine dentaire; la Clinique dentaire Charles Trottier s'est aussi jointe à nous. Les deux équipes travaillent ensemble à la même adresse.
+- Clinique familiale à Vaudreuil-Dorion depuis 1980. Adultes et enfants.
+- Adresse : Polyclinique médicale de Vaudreuil-Dorion, 600, boulevard Harwood, bureau 300, Vaudreuil-Dorion (Québec) J7V 6A3
+- Courriel : info@chezsoiedentisterie.com
+- Stationnement gratuit sur place. Chantiers autour de la clinique : prévoir quelques minutes de plus.
+- Accessible en fauteuil roulant, avec ascenseur.
+- Services en français et en anglais.
+- Secteurs : Vaudreuil-Dorion, L'Île-Perrot, Pincourt, Notre-Dame-de-l'Île-Perrot, Saint-Lazare, Hudson, Les Cèdres, Vaudreuil-sur-le-Lac.
 
 HEURES D'OUVERTURE
 - Lundi et mardi : 7 h 30 à 18 h
@@ -158,22 +161,43 @@ HEURES D'OUVERTURE
 - Samedi et dimanche : fermé
 
 PRENDRE RENDEZ-VOUS
-- Le meilleur moyen : appeler la clinique au numéro ci-dessus.
-- Nous acceptons les nouveaux patients (adultes et enfants).
+- Le plus simple : appeler pendant les heures d'ouverture.
+- Autre option : écrire à info@chezsoiedentisterie.com (demande de rendez-vous); l'équipe rappelle.
+- Nous acceptons les nouveaux patients de tous âges, adultes et enfants.
+- Premier rendez-vous, apporter : carte d'assurance maladie, liste des médicaments, carte d'assurance dentaire ou numéro de membre du RCSD si applicable.
+- Patients anxieux : le dire en prenant rendez-vous. Hypnose dentaire et sédation consciente offertes.
 
-SERVICES
-- Dentisterie générale et familiale (examens, nettoyages, obturations, etc.)
-- Urgences dentaires : nous gardons des plages chaque semaine pour les urgences. Appelez dès l'ouverture.
-- Orthodontie
-- Botox / neuromodulateurs : esthétique et thérapeutique (bruxisme, douleurs à la mâchoire)
-- Denturologie (prothèses dentaires)
+URGENCES
+- Plages réservées chaque jour pour les urgences (mal de dents, dent cassée, abcès, enflure, plombage perdu). Appeler dès l'ouverture : dans la plupart des cas, on peut vous voir le jour même.
+- RCSD accepté aussi pour les urgences.
+- Clinique fermée : enflure importante au visage, difficulté à respirer ou à avaler → urgence de l'hôpital ou 911. Douleur qui peut attendre → appeler à l'ouverture.
+- Conseils généraux en attendant (pas un diagnostic) : dent cassée ou plombage perdu, éviter de mâcher de ce côté et les aliments très chauds ou froids. Couronne tombée, la garder et l'apporter. Enflure, compresse froide sur la joue.
 
 ASSURANCES ET PAIEMENT
-- Nous acceptons les patients du Régime canadien de soins dentaires (RCSD / CDCP). Le régime ne couvre pas toujours 100 % : il peut rester un montant à payer selon le soin et le revenu. L'équipe peut l'expliquer au téléphone.
-- Pour les assurances privées et la facturation directe : appeler la clinique pour confirmer.
+- RCSD (Régime canadien de soins dentaires) : accepté, facturation directe au régime. Les tarifs du RCSD sont plus bas que les honoraires au Québec, donc il reste presque toujours une balance à payer. Le montant est indiqué avant chaque traitement.
+- Assurances privées : réclamations envoyées directement à l'assureur.
+- Enfants de moins de 10 ans : la RAMQ couvre plusieurs soins (examen annuel, radiographies, obturations). Première visite recommandée entre 1 et 3 ans.
+- Financement : prêts sur mesure à l'interne ou par un prêteur externe spécialisé (Dentalcard, www.dentalcard.ca). Demander au moment du plan de traitement.
+
+SERVICES
+- Dentisterie générale et familiale : examens, nettoyages (détartrage), radiographies numériques, obturations, scellants, protecteurs buccaux
+- Traitements de canal, couronnes, ponts, facettes, blanchiment, fermeture de diastème
+- Implants dentaires et réhabilitation complète (Dr Charles Trottier, expertise en implantologie)
+- Chirurgie : extractions, dents de sagesse, greffes gingivales
+- Traitement des gencives (parodontie)
+- Orthodontie : coquilles d'alignement (quasi invisibles), broches, appareils amovibles
+- Denturologie : prothèses complètes, partielles et sur implants (Isabelle Choquette, denturologiste)
+- Neuromodulateurs (Botox) : permis aux dentistes formés depuis juin 2025 par l'Ordre des dentistes du Québec. Pour le grincement des dents (bruxisme), tensions et douleurs à la mâchoire, parfois migraines, et esthétique (lignes d'expression). Commence par une consultation.
+- Hypnose dentaire et sédation consciente pour les patients anxieux
+- Traitement de l'apnée du sommeil et du ronflement
+
+ÉQUIPE
+- Dentistes : Dr Justin L. Bombardier, Dre Sabrina Berthiaume, Dr Marc Iskandar, Dre Lauren Li, Dr Charles Trottier
+- Denturologiste : Isabelle Choquette
+- Une équipe d'hygiénistes dentaires et de coordonnatrices de plan de traitement
 
 PRIX
-- Nous ne donnons pas de prix par clavardage : chaque cas est différent. Appeler pour une estimation.`;
+- Aucun prix par clavardage : chaque cas est différent. L'équipe donne une estimation au téléphone ou lors du plan de traitement.`;
 
 const TESTS = [
   "J'ai une rage de dents depuis hier soir, qu'est-ce que je fais?",
@@ -183,6 +207,8 @@ const TESTS = [
   "Êtes-vous ouverts samedi?",
   "Mon gencive saigne et j'ai une bosse, est-ce grave?",
   "Can I book online?",
+  "Y a-t-il du stationnement? Je suis en fauteuil roulant.",
+  "Is Dr Trottier still working? I was his patient.",
   "Est-ce que le Botox peut aider pour le grincement des dents?"
 ];
 const CHIPS = ["Prendre rendez-vous","Urgence dentaire","Heures d'ouverture","RCSD / CDCP","Nouveaux patients","English"];
@@ -192,8 +218,8 @@ const store = {
   get(k){try{return localStorage.getItem(k)}catch{return null}},
   set(k,v){try{localStorage.setItem(k,v)}catch{}}
 };
-let kb = store.get("cs_kb") || DEFAULT_KB;
-let phone = store.get("cs_phone") || "";
+let kb = store.get("cs_kb_v2") || DEFAULT_KB;
+let phone = store.get("cs_phone_v2") || "450 455-5671";
 $("kb").value = kb; $("phone").value = phone;
 
 function phoneLabel(){ return phone.trim() || "[numéro à compléter]"; }
@@ -205,10 +231,10 @@ renderCall();
 
 $("apply").onclick = () => {
   kb = $("kb").value; phone = $("phone").value;
-  store.set("cs_kb", kb); store.set("cs_phone", phone); renderCall();
+  store.set("cs_kb_v2", kb); store.set("cs_phone_v2", phone); renderCall();
   $("saved").textContent = "Appliqué. La prochaine réponse utilise cette fiche.";
 };
-$("reset").onclick = () => { $("kb").value = DEFAULT_KB; $("saved").textContent = "Fiche d'origine remise. Cliquez Appliquer pour l'utiliser."; };
+$("reset").onclick = () => { $("kb").value = DEFAULT_KB; $("phone").value = "450 455-5671"; $("saved").textContent = "Fiche d'origine remise. Cliquez Appliquer pour l'utiliser."; };
 
 TESTS.forEach(t => { const li = document.createElement("li"); const b = document.createElement("button"); b.textContent = t; b.onclick = () => ask(t); li.append(b); $("tests").append(li); });
 CHIPS.forEach(c => { const b = document.createElement("button"); b.className = "chip"; b.type = "button"; b.textContent = c; b.onclick = () => ask(c); $("chips").append(b); });
